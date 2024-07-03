@@ -317,6 +317,9 @@ module.exports = createServer(async (req, res) => {
       if (uri === URI_CATEGORIES) {
         if (req.method === "GET") return getCategoryList();
       }
+      if (uri === URI_USER) {
+        if (req.method === "GET") return getUser();
+      }
       if (uri === URI_TOTAL_PRICE) {
         if (req.method === "GET") return getTotalPrice();
       }
