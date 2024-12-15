@@ -255,16 +255,16 @@ function addProductToUserCart(data) {
   writeFileSync(DB_USER, JSON.stringify(user), { encoding: "utf8" });
 }
 
-function removeProductFromUserCart(reqBody) {
-  const { id } = reqBody;
+function removeProductsFromUserCart(reqBody) {
+  const { identifiers } = reqBody;
   const user = getUser();
-  user.cart = user.cart.filter((item) => item.id !== id);
+  user.cart = user.cart.filter((item) => !(identifiers.includes(item.id)));
   user.totalCartCost = calculateUserCart(user.cart);
   writeFileSync(DB_USER, JSON.stringify(user), { encoding: "utf8" });
   return user;
 }
 
-function changeProducrQuantityInUserCart(reqBody) {
+function changeProductQuantityInUserCart(reqBody) {
   const { id, type } = reqBody;
   const user = getUser();
   user.cart.forEach((product) => {
@@ -367,8 +367,8 @@ module.exports = createServer(async (req, res) => {
       if (uri === URI_USER) {
         if (req.method === "GET") return getUser();
         if (req.method === "POST") addProductToUserCart(await drainJson(req));
-        if (req.method === "PATCH") return changeProducrQuantityInUserCart(await drainJson(req));
-        if (req.method === "DELETE") return removeProductFromUserCart(await drainJson(req));
+        if (req.method === "PATCH") return changeProductQuantityInUserCart(await drainJson(req));
+        if (req.method === "DELETE") return removeProductsFromUserCart(await drainJson(req));
       }
       // Discount
       if (uri === "/discount") {
