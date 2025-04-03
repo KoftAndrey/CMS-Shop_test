@@ -264,10 +264,13 @@ function removeProductsFromUserCart(reqBody) {
   return user;
 }
 
-function changeProductQuantityInUserCart(reqBody) {
+function changeProductInUserCart(reqBody) {
   const { id, type } = reqBody;
   const user = getUser();
   user.cart.forEach((product) => {
+    if (product.id === id && type === 'checkbox') {
+      product.isCheckedForOrder = !product.isCheckedForOrder
+    }
     if (product.id === id && type === 'increase' && product.count !== product.maxCount) {
       product.count = Number(product.count) + 1;
     }
@@ -367,7 +370,7 @@ module.exports = createServer(async (req, res) => {
       if (uri === URI_USER) {
         if (req.method === "GET") return getUser();
         if (req.method === "POST") addProductToUserCart(await drainJson(req));
-        if (req.method === "PATCH") return changeProductQuantityInUserCart(await drainJson(req));
+        if (req.method === "PATCH") return changeProductInUserCart(await drainJson(req));
         if (req.method === "DELETE") return removeProductsFromUserCart(await drainJson(req));
       }
       // Discount
