@@ -267,10 +267,21 @@ function removeProductsFromUserCart(reqBody) {
 function changeProductInUserCart(reqBody) {
   const { id, type } = reqBody;
   const user = getUser();
+
+  if (Array.isArray(id) && type === 'checkbox') {
+    id.forEach((i) => {
+      user.cart.forEach((product) => {
+        if (product.id === i.id) {
+          product.isCheckedForOrder = i.value
+        }
+      })
+    });
+
+    writeFileSync(DB_USER, JSON.stringify(user), { encoding: "utf8" });
+    return user;
+  }
+
   user.cart.forEach((product) => {
-    if (product.id === id && type === 'checkbox') {
-      product.isCheckedForOrder = !product.isCheckedForOrder
-    }
     if (product.id === id && type === 'increase' && product.count !== product.maxCount) {
       product.count = Number(product.count) + 1;
     }
